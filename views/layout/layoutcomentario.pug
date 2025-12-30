@@ -1,0 +1,14 @@
+form(action="/resenias", method="POST").container.text-center.w-50.mt-5.frase
+    .mb-3
+        label.form-label(for="id_joya") Selecciona la joya
+        select.form-select(name="id_joya", id="id_joya", required)
+            option(value="").text-center  Selecciona una joya
+            each joya in totaljoyas
+                option(value=joya.id_joya) #{joya.nombre}
+    .mb-3
+        label.form-label(for="autor") Nombre
+        input.form-control(type="text", name="autor", id="autor", required, placeholder="Tu nombre")
+    .mb-3
+        label.form-label(for="contenido") Comentario
+        textarea.form-control(name="contenido", id="contenido", required, placeholder="Escribe tu comentario")
+    button.btn.btn-primary.text-center(type="submit") Enviar

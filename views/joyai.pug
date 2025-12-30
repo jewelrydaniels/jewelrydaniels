@@ -1,0 +1,25 @@
+extends ./layout/inicio
+
+block contenido
+    .container.mt-5
+        .row
+            .col-md-5
+                img(src=`/img/${resultado.imagen}`, class="img-fluid")
+            .col-md-7
+                h1.fw-bold #{resultado.nombre}
+                p.h2 #{resultado.material}
+                strong #{resultado.precio}€
+                p Tienda en la que se encuentra
+
+    .container.mt-5
+        h1.frase.text-center Comentarios
+        if(comentarios.length > 0)
+            each comentarioss in comentarios
+                .card.mb-2
+                    .card-body
+                        h5.card-title #{comentarioss.autor}
+                        p.card-text #{comentarioss.contenido}
+
+        else
+            .container.card.text-center.frase
+                p no hay comentarios

@@ -1,0 +1,22 @@
+extends ./layout/inicio
+
+block contenido
+    .container-fluid
+        .text-center.frase
+            .mt-md-5
+                .mb-md-5
+                    label  Elige tu propio estilo
+                    h6 Producto no comercial
+    .container
+        .row.align-items-center
+            .col-md-6.text-center.ringblack
+                img(src=`/img/black.png`,alt="imagen",class=" w-50")
+                p Limited Edition
+            .col-md-6.text-center.ringwhite.text-white
+                img(src=`/img/white.png`,alt="imagen",class=" w-50")
+                p Limited Edition
+    .container.frase.mt-5.text-center
+        p Coleccion Vintage
+    include ./layout/layout_joyas
+
+
