@@ -6,6 +6,7 @@ header{
     display: flex;
     flex-direction: column;
     border-bottom: 0.001cm solid black;
+    background-color: white;
 }
 .textnav{
     font-family: "Playfair Display", serif;
@@ -17,10 +18,14 @@ header{
 }
 .ringblack{
     background-color: white;
+    color: black;
 }
 
 .ringwhite{
     background-color: black;
+    border-radius: 5px;
+}
+.ringblack{
     border-radius: 5px;
 }
 .frase{
@@ -29,4 +34,9 @@ header{
 }
 #mensaje{
     font-family: "Playfair Display", serif;
+}
+body{
+}
+.comentario{
+    color: black !important;
 }

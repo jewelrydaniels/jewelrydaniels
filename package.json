@@ -1,16 +1,26 @@
 {
   "name": "libreria",
   "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
+  "description": "Proyecto Librería con Node.js, Express, MySQL y Pug",
   "author": "Daniel Cernicharo Toledo",
+  "license": "ISC",
   "type": "module",
   "main": "index.js",
+
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"No tests\""
   },
-  "keywords": [],
+
+  "keywords": [
+    "node",
+    "express",
+    "mysql",
+    "sequelize",
+    "pug"
+  ],
+
   "dependencies": {
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
@@ -18,7 +28,12 @@
     "pug": "^3.0.3",
     "sequelize": "^6.37.7"
   },
+
   "devDependencies": {
     "nodemon": "^3.1.11"
+  },
+
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

@@ -8,15 +8,32 @@ block contenido
             .col-md-7
                 h1.fw-bold #{resultado.nombre}
                 p.h2 #{resultado.material}
-                strong #{resultado.precio}€
-                p Tienda en la que se encuentra
+                p.mt-3
+                    strong #{resultado.precio}€
+                label #{resultado.tiendas}
+                    svg(xmlns='http://www.w3.org/2000/svg' height='24px' viewbox='0 -960 960 960' width='24px' fill='#000000')
+                        path(d='M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 294q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z')
 
+
+    if(resultado.stock < 10)
+            .container.card-body.text-center.frase.rounded-1.bg-warning
+                .row.align-items-center.text-center
+                    .col-md-2
+
+                        img(src=`/img/${resultado.imagen}`, class="img-fluid")
+                    .col-md-10
+                        p Bajo en Stock
+                        p #{resultado.stock} disponible
+
+    .container.frase.mt-5.text-center
+        p Mas Productos
+    include ./layout/layout_joyasinfo
     .container.mt-5
         h1.frase.text-center Comentarios
         if(comentarios.length > 0)
             each comentarioss in comentarios
                 .card.mb-2
-                    .card-body
+                    .card-body.comentario
                         h5.card-title #{comentarioss.autor}
                         p.card-text #{comentarioss.contenido}
 

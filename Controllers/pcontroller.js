@@ -34,7 +34,7 @@ const paginajoyas = async (req, res) => {
 // Información de una joya y sus comentarios
 const informacionJoyas = async (req, res) => {
     const { slug } = req.params;
-
+    const joyas = await Joya.findAll({ limit: 3 });
     try {
         const resultado = await Joya.findOne({
             where: { slug },
@@ -48,6 +48,7 @@ const informacionJoyas = async (req, res) => {
         res.render('joyai', {
             pagina: 'Información de Joyas',
             resultado,
+            joya : joyas,
             comentarios: resultado.comentarios || [] // array vacío si no hay comentarios
         });
     } catch (error) {

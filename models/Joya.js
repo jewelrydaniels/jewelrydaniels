@@ -29,6 +29,9 @@ export const Joya = db.define('joyas', {
     slug: {
         type: Sequelize.STRING, // nombre o ruta de la imagen
     },
+    tiendas: {
+        type: Sequelize.STRING, // nombre o ruta de la imagen
+    }
 },{
     tableName: 'joyas',
     timestamps: false
