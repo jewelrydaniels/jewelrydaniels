@@ -1,0 +1,61 @@
+extends ./layout/inicio
+
+block contenido
+    main.container.mt-5
+        h1.text-center.mb-5.fw-bold Mi Carrito de Compras
+
+        if carrito && carrito.length > 0
+            .row
+                .col-md-9
+                    .card.shadow-sm.p-3
+                        table.table.align-middle
+                            thead.table-light
+                                tr
+                                    th(scope='col') Producto
+                                    th(scope='col') Precio
+                                    th(scope='col' class="text-center") Cantidad
+                                    th(scope='col' class="text-end") Subtotal
+                                    th(scope='col')
+                            tbody
+                                each item in carrito
+                                    tr
+                                        td
+                                            .d-flex.align-items-center
+                                                img(src=`/img/${item.imagen}`, alt=item.nombre, style="width: 60px; height: 60px; object-fit: cover;").rounded.me-3
+                                                span.fw-bold #{item.nombre}
+                                        td #{item.precio}€
+                                        td.text-center #{item.cantidad}
+                                        td.text-end.fw-bold #{(item.precio * item.cantidad).toFixed(2)}€
+                                        td.text-end
+                                            form(action="/carrito/eliminar" method="POST" style="display:inline;")
+                                                input(type="hidden" name="id_joya" value=item.id)
+                                                button.btn.btn-outline-danger.btn-sm(type="submit")
+                                                    i.fas.fa-trash
+
+                .col-md-3
+                    .card.shadow-sm.p-4.bg-light
+                        h4.fw-bold Resumen
+                        hr
+                        .d-flex.justify-content-between.mb-3
+                            span Subtotal:
+                            span #{carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0).toFixed(2)}€
+                        .d-flex.justify-content-between.mb-3
+                            span Envío:
+                            span.text-success Gratis
+                        hr
+                        .d-flex.justify-content-between.mb-4
+                            span.h5.fw-bold Total:
+                            span.h5.fw-bold #{carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0).toFixed(2)}€
+
+                        form(action="/finalizar-pago" method="POST")
+                            button.btn.btn-dark.w-100.py-2.fw-bold(type="submit") Finalizar Pago
+
+                        a.btn.btn-link.w-100.text-muted.mt-2(href="/joyas") Seguir Comprando
+        else
+            .text-center.py-5
+                svg(xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-cart-x text-muted mb-4" viewBox="0 0 16 16")
+                    path(d="M7.354 5.646a.5.5 0 1 0-.708.708L7.793 7.5 6.646 8.646a.5.5 0 1 0 .708.708L8.5 8.207l1.146 1.147a.5.5 0 0 0 .708-.708L9.207 7.5l1.147-1.146a.5.5 0 0 0-.708-.708L8.5 6.793 7.354 5.646z")
+                    path(d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z")
+                h2 Tu carrito está vacío
+                p.text-muted ¡Aún no has añadido ninguna de nuestras joyas exclusivas!
+                a.btn.btn-dark.btn-lg.mt-3(href="/joyas") Ver Catálogo

@@ -1,0 +1,16 @@
+extends ./layout/inicio
+
+block contenido
+    main.container.mt-5.text-center
+        .py-5
+            i.fas.fa-check-circle.fa-5x.text-success.mb-4
+            h1.fw-bold ¡Muchas gracias por tu compra!
+            p.lead Hola #{usuario.nombre}, hemos recibido tu pedido correctamente.
+            p.text-muted Se ha enviado un correo de confirmación a:
+                strong #{usuario.email}
+
+            hr.my-4
+
+            .d-grid.gap-2.d-md-block
+                a.btn.btn-dark.btn-lg.px-5(href="/joyas") Volver a la Tienda
+                a.btn.btn-outline-secondary.btn-lg.ms-md-3(href="/") Ir al Inicio

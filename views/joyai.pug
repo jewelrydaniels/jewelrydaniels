@@ -9,34 +9,70 @@ block contenido
                 h1.fw-bold #{resultado.nombre}
                 p.h2 #{resultado.material}
                 p.mt-3
-                    strong #{resultado.precio}€
+                    strong.h3 #{resultado.precio}€
+
+                //- SECCIÓN DEL CARRITO
+                .mt-4.mb-4
+                    if usuario
+                        form(action="/carrito/agregar" method="POST")
+                            input(type="hidden" name="id_joya" value=resultado.id_joya)
+                            button.btn.btn-dark.btn-lg.px-5.fw-bold(type="submit")
+                                svg.me-2(xmlns='http://www.w3.org/2000/svg' height='24px' viewbox='0 -960 960 960' width='24px' fill='#FFFFFF')
+                                    path(d='M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T800-160q0 33-23.5 56.5T680-80ZM246-720l66 140h310l106-190H226l-30-60H80v60h106l150 310q10 20 28 32t40 12h286q22 0 40-12t28-32l136-248q11-20 1-40t-31-20H246Z')
+                                | Añadir al Carrito
+                    else
+                        .alert.alert-light.border.d-inline-block
+                            p.mb-2 ¿Te gusta esta pieza?
+                            a.btn.btn-outline-dark.btn-sm(href="/login") Inicia sesión para comprar
+
                 label #{resultado.tiendas}
                     svg(xmlns='http://www.w3.org/2000/svg' height='24px' viewbox='0 -960 960 960' width='24px' fill='#000000')
                         path(d='M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 294q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z')
 
 
     if(resultado.stock < 10)
-            .container.card-body.text-center.frase.rounded-1.bg-warning
-                .row.align-items-center.text-center
-                    .col-md-2
-
-                        img(src=`/img/${resultado.imagen}`, class="img-fluid")
-                    .col-md-10
-                        p Bajo en Stock
-                        p #{resultado.stock} disponible
+        .container.card-body.text-center.frase.rounded-1.bg-warning.mt-4
+            .row.align-items-center.text-center
+                .col-md-2
+                    img(src=`/img/${resultado.imagen}`, class="img-fluid" style="max-height: 50px")
+                .col-md-10
+                    p.mb-0 **Bajo en Stock**: Solo quedan #{resultado.stock} unidades disponibles.
 
     .container.frase.mt-5.text-center
         p Mas Productos
     include ./layout/layout_joyasinfo
+
+    .container.mt-5.mb-5
+        h2.text-center.mb-4 Cuéntanos tu experiencia
+
+        if usuario
+            .row.justify-content-center
+                .col-md-8.card.shadow.p-4
+                    form(action="/resenias" method="POST")
+                        input(type="hidden" name="id_joya" value=resultado.id_joya)
+                        .mb-3
+                            label.form-label.fw-bold Autor
+                            input.form-control(type="text" name="autor" value=usuario.nombre readonly)
+
+                        .mb-3
+                            label.form-label.fw-bold Tu Comentario
+                            textarea.form-control(name="contenido" rows="4" placeholder="¿Qué te pareció este diseño?" required)
+
+                        button.btn.btn-dark.w-100.fw-bold(type="submit") Publicar Comentario
+        else
+            .row.justify-content-center
+                .col-md-8.text-center.alert.alert-light.border
+                    p Solo los miembros pueden dejar reseñas.
+                    a.btn.btn-sm.btn-outline-dark(href="/login") Iniciar Sesión para comentar
+
     .container.mt-5
         h1.frase.text-center Comentarios
         if(comentarios.length > 0)
             each comentarioss in comentarios
                 .card.mb-2
                     .card-body.comentario
-                        h5.card-title #{comentarioss.autor}
+                        h5.card-title.fw-bold #{comentarioss.autor}
                         p.card-text #{comentarioss.contenido}
-
         else
-            .container.card.text-center.frase
-                p no hay comentarios
+            .container.card.text-center.frase.p-4
+                p Aún no hay comentarios. ¡Sé el primero en opinar!

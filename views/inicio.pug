@@ -1,33 +1,70 @@
 extends ./layout/inicio
 
 block contenido
-    .container-fluid
-        .text-center.frase
-            .mt-md-5
-                .mb-md-5
-                    label  Elige tu propio estilo
-                    h6 Producto no comercial
-    .container
-        .row.align-items-center
-            .col-md-6.text-center.ringblack
-                img(src=`/img/black.png`,alt="imagen",class=" w-50")
-                p Limited Edition
-            .col-md-6.text-center.ringwhite.text-white
-                img(src=`/img/white.png`,alt="imagen",class=" w-50")
-                p Limited Edition
+    //- SECCIÓN 1: HERO (Introducción refinada)
+    section.py-5.bg-light
+        .container.text-center.frase
+            .mt-md-5.mb-md-5
+                span.text-uppercase.letter-spacing-2.text-muted Desde 1994
+                h1.display-3.fw-bold.mt-2 Jewelry Daniels
+                p.lead.text-secondary Redefiniendo el lujo contemporáneo a través de la artesanía.
 
+    //- SECCIÓN 2: PRODUCTOS DESTACADOS (Dualidad Blanco y Negro)
+    section.container.my-5
+        .row.g-0.align-items-center.shadow.rounded-overflow
+            .col-md-6.text-center.py-5.bg-white.ring-section
+                img(src=`/img/black.png`, alt="Anillo Black", class="img-fluid w-50 hover-zoom")
+                h3.mt-4.fw-light Ónix Profundo
+                p.text-muted Edición Limitada en Titanio Negro
+                small.text-black-50 Proximamente...
 
-    .container.text-center.mt-5
-        .row
-            .col-md-12.frase.mt-2
-                h1 Productos 2026
-                img(src="/image/imagen.png" class="img-fluid")
+            .col-md-6.text-center.py-5.bg-dark.text-white.ring-section
+                img(src=`/img/white.png`, alt="Anillo White", class="img-fluid w-50 hover-zoom")
+                h3.mt-4.fw-light Brillo Eterno
+                p.text-light.opacity-75 Plata de Ley y Diamantes Blancos
+                small.text-white-50 Proximamente...
 
+    //- SECCIÓN 3: NUESTRA HISTORIA (Contenido nuevo)
+    section.py-5
+        .container
+            .row.align-items-center
+                .col-md-6
+                    h2.display-5.fw-bold El Arte de la Orfebrería
+                    p.mt-4.text-secondary En Daniel's, cada pieza es tratada como una obra de arte única. No creemos en la producción en masa; creemos en el tiempo, la paciencia y la precisión del maestro artesano.
+                    pNuestras gemas son seleccionadas éticamente y montadas a mano en nuestro taller local, garantizando que cada curva y cada brillo sean perfectos.
+                    a.text-dark.fw-bold.text-decoration-none(href="/historia") Leer nuestra historia →
+                .col-md-6.mt-4.mt-md-0
+                    //- Aquí puedes poner una imagen de un taller o herramientas de joyería
+                    img(src="/img/nosotros.png" class="img-fluid rounded shadow" alt="Taller de joyería")
 
+    //- SECCIÓN 4: VALORES DE MARCA
+    section.bg-dark.text-white.py-5
+        .container
+            .row.text-center
+                .col-md-4
+                    h5 Envío Global
+                    p.small.opacity-50 Entrega asegurada en más de 50 países.
+                .col-md-4
+                    h5 Garantía de por Vida
+                    p.small.opacity-50 Confianza total en nuestra durabilidad.
+                .col-md-4
+                    h5 Packaging de Lujo
+                    p.small.opacity-50 Cada joya llega en su cofre artesanal.
 
-    .container.frase.mt-5.text-center
-        p Coleccion Vintage
+    //- SECCIÓN 5: EXPLORAR COLECCIONES (Listado de joyas)
+    section.container.py-5
+        .text-center.mb-5
+            h2.display-6.frase Explorar Colecciones
+            p.text-muted Encuentra la pieza que define tu historia
+        include ./layout/layout_joyas
 
-    include ./layout/layout_joyas
-
-
+    if  !usuario
+        section.py-5.bg-light.border-top
+            .container.text-center
+                .row.justify-content-center
+                    .col-md-6
+                        h3 Únete al Círculo Daniel's
+                        p.text-muted Recibe acceso prioritario a nuevas ediciones limitadas y eventos exclusivos.
+                        form.mt-4.d-flex(action="/suscribirse" method="POST")
+                            input.form-control.me-2(type="email" name="email" placeholder="Tu correo electrónico")
+                            button.btn.btn-dark Suscribirse

@@ -1,0 +1,27 @@
+extends ./layout/inicio
+
+block contenido
+    main.container.mt-5
+        .row.justify-content-center
+            .col-md-6
+                h1.text-center= pagina
+
+                if errores
+                    each error in errores
+                        .alert.alert-danger.text-center.py-2= error.mensaje
+
+                .card.shadow.border-0.mt-4
+                    .card-body.p-5
+                        form(action="/login" method="POST")
+                            .mb-3
+                                label.form-label(for="email") Correo Electrónico
+                                input#email.form-control(type="email", name="email", placeholder="tu@correo.com", required)
+                            .mb-3
+                                label.form-label(for="password") Contraseña
+                                input#password.form-control(type="password", name="password", placeholder="Tu contraseña", required)
+
+                            input.btn.btn-dark.w-100.uppercase.letter-spacing-1(type="submit", value="Entrar")
+
+                        .mt-3.text-center
+                            p ¿Aún no tienes cuenta?
+                                a(href="/registro") Regístrate aquí

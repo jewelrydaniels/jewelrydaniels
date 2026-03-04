@@ -4,15 +4,15 @@
             href=`joyas/${joyas.slug}`
             class="col-md-6 col-lg-4 mb-4 d-flex text-decoration-none text-dark"
         )
-            .card.text-center.align-items-center.p-3.w-100.h-100
-                img(
-                    src=`/img/${joyas.imagen}`
-                    alt=joyas.nombre
-                    style="width:150px; height:150px; object-fit:contain;"
-                    class="mb-3"
-                    class="mb-3"
-                )
-                h3.mt-2= joyas.nombre
-                p.mb-1 #{joyas.tipo} - #{joyas.material}
-                p.mb-1 Precio: $#{joyas.precio}
-                p.mt-auto Stock: #{joyas.stock} disponibles
+            .card.text-center.p-3.w-100.shadow-sm.border-0.h-100
+                .d-flex.align-items-center.justify-content-center(style="height: 180px;")
+                    img(
+                        src=`/img/${joyas.imagen}`
+                        alt=joyas.nombre
+                        style="max-width: 100%; max-height: 100%; object-fit: contain;"
+                    )
+
+                .card-body.d-flex.flex-column.p-0.mt-3
+                    h3.h5.fw-bold= joyas.nombre
+                    p.text-muted.small.mb-2 #{joyas.tipo} - #{joyas.material}
+                    p.fw-bold.text-dark.mb-1 Precio: $#{joyas.precio}

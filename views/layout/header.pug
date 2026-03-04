@@ -1,12 +1,29 @@
 header
     .navegacion
         .container
-            .row.justify-content-center.justify-content-md-between.align-items-center.py-4
+            .row.justify-content-center.justify-content-md-between.align-items-center.py-3
                 .col-md-4.logo
                     a(href="/")
-                        img(src="/image/logo.png",alt="sitio logo")
+                        img(src="/image/logo.png", alt="sitio logo", style="max-width: 200px;")
                 .col-md-8
-                    nav.mt-5.mt-md-0.nav.justify-content-sm-end.textnav
+                    nav.nav.justify-content-center.justify-content-md-end.align-items-center.textnav
                         a.nav-link(href="/joyas") Joyas
-                        a.nav-link(href="/resenias") Reseñas
                         a.nav-link(href="/historia") Historia
+
+                        //- Separador visual opcional
+                        span.separador.d-none.d-md-block |
+
+                        if usuario
+                            //- Icono del Carrito con contador dinámico
+                            a.nav-link.position-relative.me-2(href="/carrito" title="Ver mi carrito")
+                                svg(xmlns='http://www.w3.org/2000/svg' height='26px' viewbox='0 -960 960 960' width='26px' fill='#000000')
+                                    path(d='M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T800-160q0 33-23.5 56.5T680-80ZM246-720l66 140h310l106-190H226l-30-60H80v60h106l150 310q10 20 28 32t40 12h286q22 0 40-12t28-32l136-248q11-20 1-40t-31-20H246Z')
+                                //- para saber la cantidad de productos que tengo, si tengo 2 productos de lo mismo, solo va salir uno, porque si son iguales, no aumenta el array de la session sino la cantidad
+                                if carrito && carrito.length > 0
+                                    span.position-absolute.top-0.start-100.translate-middle.badge.rounded-pill.bg-warning(style="font-size: 0.65rem; padding: 0.35em 0.5em;")
+                                        | #{carrito.length}
+
+                            a.nav-link.text-dark.fw-bold(href="/perfil") #{usuario.nombre}
+                            a.nav-link.btn-logout(href="/logout") Salir
+                        else
+                            a.nav-link.auth-link(href="/login") Eres miembro?

@@ -6,13 +6,11 @@
   "license": "ISC",
   "type": "module",
   "main": "index.js",
-
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"No tests\""
   },
-
   "keywords": [
     "node",
     "express",
@@ -20,19 +18,19 @@
     "sequelize",
     "pug"
   ],
-
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "express-session": "^1.19.0",
     "mysql2": "^3.16.0",
+    "nodemailer": "^8.0.1",
     "pug": "^3.0.3",
     "sequelize": "^6.37.7"
   },
-
   "devDependencies": {
     "nodemon": "^3.1.11"
   },
-
   "engines": {
     "node": ">=18.0.0"
   }

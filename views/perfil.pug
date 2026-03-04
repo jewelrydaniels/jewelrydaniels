@@ -1,0 +1,58 @@
+extends ./layout/inicio
+
+block contenido
+    .container.mt-5
+        .row.justify-content-center
+            .col-md-8
+                .card.shadow.mb-4
+                    .card-header.bg-dark.text-white
+                        h3.text-center Mi Perfil
+                    .card-body
+                        if msg === 'actualizado'
+                            .alert.alert-success Datos actualizados correctamente
+
+                        form(action="/perfil/actualizar" method="POST")
+                            .mb-3
+                                label.form-label Nombre
+                                input.form-control(type="text" name="nombre" value=usuario.nombre required)
+                            .mb-3
+                                label.form-label Email (No editable)
+                                input.form-control(type="email" value=usuario.email disabled)
+                            .mb-3
+                                label.form-label Nueva Contraseña
+                                input.form-control(type="password" name="password" placeholder="********")
+
+                            button.btn.btn-dark.w-100(type="submit") Guardar Cambios
+
+                //- SECCIÓN DE HISTORIAL DE COMPRAS
+                .card.shadow-sm.mb-4
+                    .card-header.bg-secondary.text-white
+                        h5.mb-0 Mis Pedidos Recientes
+                    .card-body
+                        if compras.length > 0
+                            .table-responsive
+                                table.table.table-hover
+                                    thead.table-light
+                                        tr
+                                            th Joya
+                                            th.text-center Cant.
+                                            th Precio
+                                            th Fecha
+                                    tbody
+                                        each compra in compras
+                                            tr
+                                                td.fw-bold #{compra.nombre_joya}
+                                                td.text-center #{compra.cantidad}
+                                                td #{compra.precio}€
+                                                td #{compra.fecha.toLocaleDateString('es-ES')}
+                        else
+                            .text-center.py-3
+                                p.text-muted No tienes compras registradas todavía.
+
+                //- Zona de peligro
+                .card.border-danger
+                    .card-body.text-center
+                        h5.text-danger Zona de Peligro
+                        p Una vez eliminada la cuenta, no hay marcha atrás.
+                        form(action="/perfil/eliminar" method="POST" onsubmit="return confirm('¿Estás seguro?')")
+                            button.btn.btn-outline-danger.btn-sm(type="submit") Eliminar mi cuenta

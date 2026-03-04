@@ -1,0 +1,30 @@
+extends ./layout/inicio
+
+block contenido
+    .container.mt-5.d-flex.justify-content-center
+        .card.shadow.w-50
+            .card-body
+                h3.text-center.mb-4 Gestor Joyeria
+
+                form(action="/admin", method="POST")
+                    .mb-3
+                        label.form-label(for="nombre") Usuario
+                        input.form-control(
+                            type="text",
+                            name="nombre",
+                            id="nombre",
+                            required,
+                            placeholder="Introduce tu usuario"
+                        )
+
+                    .mb-3
+                        label.form-label(for="clave") Contraseña
+                        input.form-control(
+                            type="password",
+                            name="clave",
+                            id="clave",
+                            required,
+                            placeholder="Introduce tu contraseña"
+                        )
+
+                    button.btn.btn-primary.w-100(type="submit") Iniciar sesión
