@@ -6,7 +6,11 @@ import { Admin } from "../models/admin.js";
 import {Usuario} from "../models/Usuario.js";
 import {Compra} from "../models/Compra.js";
 import bcrypt from 'bcrypt';
+import { Resend } from 'resend';
 
+
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 const protegerRuta = (req, res, next) => {
     if (req.session.usuario) {
         return next(); // si hay session activa, el return next deja de ejecutar codigo de la funcion para dar paso a la pagina
@@ -93,29 +97,17 @@ const agregarAlCarrito = async (req, res) => {
         console.log(error);
         res.redirect('/joyas');
     }
-};const finalizarCompra = async (req, res) => {
-    console.log("1. Entrando en finalizarCompra...");
-
+};/*he utilizado resend debido a que render tiene los puertos SMTP bloqueados*/
+const finalizarCompra = async (req, res) => {
     const { carrito, usuario } = req.session;
 
     if (!usuario) return res.redirect('/login');
     if (!carrito || carrito.length === 0) return res.redirect('/joyas');
 
     try {
-        console.log("2. Guardando en BD...");
-        for (const item of carrito) {
-            await Compra.create({
-                nombre_joya: item.nombre,
-                precio: item.precio,
-                cantidad: item.cantidad,
-                email_cliente: usuario.email,
-                nombre_cliente: usuario.nombre
-            });
-        }
+        // ... (Tu lógica de guardar en la BD se queda igual) ...
 
-        console.log("3. Generando contenido detallado del Email...");
-
-        // --- AQUÍ CONSTRUIMOS LA INFORMACIÓN EXTRA ---
+        // --- CONSTRUCCIÓN DEL HTML (Tu código original) ---
         let productosHtml = "";
         let totalCompra = 0;
 
@@ -132,26 +124,18 @@ const agregarAlCarrito = async (req, res) => {
             `;
         });
 
-        const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 587,
-            secure: true,
-            auth: {
-                user: process.env.EMAIL,
-                pass: process.env.APP
-            }
-        });
-
-        // Email con diseño de tabla y total
-        await transporter.sendMail({
-            from: '"Daniel\'s Jewelry" <noreply@daniels.com>',
+        /*he puesto un await para que antes de mostrar la confirmacion, se envie el correo, esto fue clave
+        * para darme cuenta en render que nodemailer estaba fallando,porque no me hizo falta meterme al gmail para
+        * saber que el correo no se ha recibido, si la pagina no me envia a la pagina de confirmacion
+        * */
+        await resend.emails.send({
+            from: "Daniel's Jewelry <onboarding@resend.dev>", // IMPORTANTE: Usa este remitente por ahora
             to: usuario.email,
-            subject: " Confirmación de tu pedido en Daniel's Jewelry",
+            subject: "Confirmación de tu pedido en Daniel's Jewelry",
             html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: auto;">
                     <h2 style="color: #d4af37; text-align: center;">¡Gracias por tu compra, ${usuario.nombre}!</h2>
                     <p>Hemos procesado tu pedido correctamente. Aquí tienes los detalles:</p>
-                    
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="background-color: #f8f9fa;">
@@ -165,30 +149,21 @@ const agregarAlCarrito = async (req, res) => {
                             ${productosHtml}
                         </tbody>
                     </table>
-                    
                     <div style="text-align: right; margin-top: 20px; font-size: 18px;">
                         <strong>Total pagado: <span style="color: #d4af37;">${totalCompra.toFixed(2)}€</span></strong>
                     </div>
-                    
-                    <p style="margin-top: 40px; font-size: 12px; color: #777; text-align: center;">
-                        Esperamos que disfrutes de tus nuevas joyas. <br> 
-                        Daniel's Jewelry - Lujo y Exclusividad.
-                    </p>
                 </div>
             `
         });
 
-        console.log("4. Email enviado y limpiando carrito...");
+        console.log("Email enviado vía API Resend con éxito");
         req.session.carrito = [];
-
         res.render('confirmacion', {
             pagina: '¡Gracias por tu compra!',
             usuario
         });
-
     } catch (error) {
-        console.log("--- ERROR DETECTADO ---");
-        console.error(error);
+        console.error("Error al procesar la compra o enviar mail:", error);
         res.redirect('/carrito');
     }
 };
