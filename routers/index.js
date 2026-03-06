@@ -12,7 +12,6 @@ import {
     registrarUsuario,
     cerrarSesion,
     protegerRuta,
-    // --- NUEVAS IMPORTACIONES ---
     mostrarPerfil,
     actualizarPerfil,
     eliminarCuenta,
@@ -20,7 +19,9 @@ import {
     agregarAlCarrito,
     mostrarCarrito,
     eliminarDelCarrito,
-    finalizarCompra
+    finalizarCompra,
+    mostrarLogin,
+    mostrarRegistro
 } from "../Controllers/pcontroller.js";
 
 const router = express.Router();
@@ -33,20 +34,13 @@ router.get('/joyas/:slug', informacionJoyas);
 router.post('/resenias', crearComentario);
 router.get('/historia', historia);
 
-// --- RUTAS DE PERFIL / CONFIGURACIÓN ---
-// Ver la página de configuración (protegida)
 router.get('/perfil', protegerRuta, mostrarPerfil);
-
-// Procesar el cambio de nombre o contraseña
 router.post('/perfil/actualizar', protegerRuta, actualizarPerfil);
-
-// Procesar el borrado de la cuenta
 router.post('/perfil/eliminar', protegerRuta, eliminarCuenta);
 
-// --- AUTENTICACIÓN ---
-router.get('/login', (req, res) => res.render('login', { pagina: 'Iniciar Sesión' }));
+router.get('/login', mostrarLogin);
 router.post('/login', autenticarUsuario);
-router.get('/registro', (req, res) => res.render('registro', { pagina: 'Crear Cuenta' }));
+router.get('/registro', mostrarRegistro);
 router.post('/registro', registrarUsuario);
 router.get('/logout', cerrarSesion);
 router.post('/suscribirse',enviarEmailSuscripcion)

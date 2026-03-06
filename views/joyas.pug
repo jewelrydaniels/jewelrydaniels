@@ -1,5 +1,23 @@
 extends ./layout/inicio
 
 block contenido
+    //- Dentro de tu bloque de contenido o en un parcial
+    //- Agrégalo justo encima del include de las joyas
+    .container.mt-5
+        .row.justify-content-center
+            .col-md-8
+                form(action="/joyas" method="GET")
+                    .input-group.mb-3.shadow-sm
+                        input.form-control(
+                            type="text"
+                            name="term"
+                            placeholder="Buscar joyas..."
+                            value= term ? term : ''
+                        )
+                        button.btn.btn-gold(type="submit")
+                            | Buscar
+                        if term
+                            a.btn.btn-outline-danger(href="/joyas")
+                                | Quitar filtro
     include ./layout/layout_joyas
 

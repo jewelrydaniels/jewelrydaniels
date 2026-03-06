@@ -7,8 +7,8 @@ import {Usuario} from "../models/Usuario.js";
 import {Compra} from "../models/Compra.js";
 import bcrypt from 'bcrypt';
 import { Resend } from 'resend';
-
-
+import { Op } from 'sequelize';
+import nodemailer from 'nodemailer';/*actualmente descartado por render*/
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const protegerRuta = (req, res, next) => {
@@ -17,7 +17,18 @@ const protegerRuta = (req, res, next) => {
     }
     res.redirect('/login');
 };
-import nodemailer from 'nodemailer';
+
+const mostrarLogin = (req, res) => {
+    res.render('login', {
+        pagina: 'Iniciar Sesión'
+    });
+};
+
+const mostrarRegistro = (req, res) => {
+    res.render('registro', {
+        pagina: 'Crear Cuenta'
+    });
+};
 
 const enviarEmailSuscripcion = async (req, res) => {
     const { email } = req.body;
@@ -67,7 +78,6 @@ const paginaInicio = async (req, res) => {
         res.status(500).send('Error al cargar la página de inicio');
     }
 };
-// Añadir al carrito
 const agregarAlCarrito = async (req, res) => {
     const { id_joya } = req.body;
 
@@ -97,7 +107,9 @@ const agregarAlCarrito = async (req, res) => {
         console.log(error);
         res.redirect('/joyas');
     }
-};/*he utilizado resend debido a que render tiene los puertos SMTP bloqueados*/
+};
+/*he utilizado resend debido a que render tiene los puertos SMTP bloqueados aunque con resend solo me deja enviar email al correo que tengo puesta
+* en esa cuenta :( */
 const finalizarCompra = async (req, res) => {
     const { carrito, usuario } = req.session;
 
@@ -105,15 +117,20 @@ const finalizarCompra = async (req, res) => {
     if (!carrito || carrito.length === 0) return res.redirect('/joyas');
 
     try {
-        // ... (Tu lógica de guardar en la BD se queda igual) ...
-
-        // --- CONSTRUCCIÓN DEL HTML (Tu código original) ---
         let productosHtml = "";
         let totalCompra = 0;
-
-        carrito.forEach(item => {
+        const fechaActual = new Date();
+        for (const item of carrito) {/*recorro el array del carrito para luego poder verlo desde el perfil con la tabla 'compras' */
             const subtotal = item.precio * item.cantidad;
             totalCompra += subtotal;
+            await Compra.create({
+                nombre_joya: item.nombre,
+                precio: item.precio,
+                cantidad: item.cantidad,
+                fecha: fechaActual,
+                email_cliente: usuario.email,
+                nombre_cliente: usuario.nombre
+            });
             productosHtml += `
                 <tr>
                     <td style="padding: 10px; border-bottom: 1px solid #ddd;">${item.nombre}</td>
@@ -122,20 +139,15 @@ const finalizarCompra = async (req, res) => {
                     <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">${subtotal.toFixed(2)}€</td>
                 </tr>
             `;
-        });
-
-        /*he puesto un await para que antes de mostrar la confirmacion, se envie el correo, esto fue clave
-        * para darme cuenta en render que nodemailer estaba fallando,porque no me hizo falta meterme al gmail para
-        * saber que el correo no se ha recibido, si la pagina no me envia a la pagina de confirmacion
-        * */
+        }
         await resend.emails.send({
-            from: "Daniel's Jewelry <onboarding@resend.dev>", // IMPORTANTE: Usa este remitente por ahora
+            from: "Daniel's Jewelry <onboarding@resend.dev>",
             to: usuario.email,
             subject: "Confirmación de tu pedido en Daniel's Jewelry",
             html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: auto;">
                     <h2 style="color: #d4af37; text-align: center;">¡Gracias por tu compra, ${usuario.nombre}!</h2>
-                    <p>Hemos procesado tu pedido correctamente. Aquí tienes los detalles:</p>
+                    <p>Tu pedido ha sido registrado y procesado correctamente.</p>
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="background-color: #f8f9fa;">
@@ -156,28 +168,27 @@ const finalizarCompra = async (req, res) => {
             `
         });
 
-        console.log("Email enviado vía API Resend con éxito");
+        console.log("Compra guardada en BD y Email enviado con éxito");
+
+        // Limpiamos carrito y renderizamos confirmación
         req.session.carrito = [];
         res.render('confirmacion', {
             pagina: '¡Gracias por tu compra!',
             usuario
         });
+
     } catch (error) {
-        console.error("Error al procesar la compra o enviar mail:", error);
+        console.error("Error al procesar la compra:", error);
         res.redirect('/carrito');
     }
 };
 const eliminarDelCarrito = (req, res) => {
     const { id_joya } = req.body;
 
-    // Verificamos si existe el carrito en la sesión
     if (req.session.carrito) {
-        // Filtramos: "Quédate con todos los que NO tengan este ID"
-        // Usamos != para comparar string vs number sin problemas, o parseInt
         req.session.carrito = req.session.carrito.filter(item => item.id != id_joya);
     }
 
-    // Redirigimos de vuelta al carrito para ver los cambios
     res.redirect('/carrito');
 };
 const mostrarCarrito = (req, res) => {
@@ -198,16 +209,13 @@ const autenticarUsuario = async (req, res) => {
     if (!usuario) {
         return res.render('login', { pagina: 'Login', errores: [{mensaje: 'Usuario no existe'}] });
     }
-
     const passwordCorrecto = await bcrypt.compare(password, usuario.password);
-
     if (passwordCorrecto) {
         req.session.usuario = {/* asi puedo usar la session en toda la pagina web*/
             id: usuario.id,
             nombre: usuario.nombre,
             email: usuario.email
         };
-
         res.redirect('/joyas');
     } else {
         res.render('login', { pagina: 'Login', errores: [{mensaje: 'Password incorrecto'}] });
@@ -215,10 +223,9 @@ const autenticarUsuario = async (req, res) => {
 }
 const cerrarSesion = (req, res) => {
     req.session.destroy(() => {
-        res.redirect('/');// nos dirige al index al cerrar la sesion
+        res.redirect('/');
     });
 };
-
 const registrarUsuario = async (req, res) => {
     const { nombre, email, password } = req.body;
 
@@ -265,19 +272,33 @@ const administradorinicio = async (req, res) => {
     }
 };
 const paginajoyas = async (req, res) => {
+    const { term } = req.query;
     try {
-        const joyas = await Joya.findAll();
+        let joyas;
+        if (term && term.trim() !== "") {
+            joyas = await Joya.findAll({
+                where: {
+                    nombre: {
+                        [Op.like]: `%${term}%`
+                    }
+                }
+            });
+        } else {
+            joyas = await Joya.findAll();
+        }
         res.render('joyas', {
-            pagina: 'Joyas',
             joya: joyas,
+            term /* es el valor de la query, lo usamos para  poner el boton de quitar filtro*/
         });
+
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error al cargar las joyas');
     }
 };
+const cargarTodaslasJoyas = async(req,res) => {
 
-// Información de una joya y sus comentarios
+
+}
 const informacionJoyas = async (req, res) => {
     const { slug } = req.params;
     const joyas = await Joya.findAll({ limit: 3 });
@@ -295,7 +316,7 @@ const informacionJoyas = async (req, res) => {
             pagina: 'Información de Joyas',
             resultado,
             joya : joyas,
-            comentarios: resultado.comentarios || [] // array vacío si no hay comentarios
+            comentarios: resultado.comentarios // array vacío si no hay comentarios
         });
     } catch (error) {
         console.error(error);
@@ -308,22 +329,18 @@ const informacionJoyas = async (req, res) => {
 const mostrarPerfil = async (req, res) => {
     const { msg } = req.query;
 
-    // 1. Extraemos el email del usuario que tiene la sesión iniciada
     const { email } = req.session.usuario;
 
     try {
-        // 2. Consultamos la tabla 'compras' filtrando por ese email
-        // Usamos 'findAll' para traer todas las filas que coincidan
         const compras = await Compra.findAll({
             where: { email_cliente: email },
-            order: [['fecha', 'DESC']] // Para que la última compra salga arriba
+            order: [['fecha', 'DESC']]
         });
 
-        // 3. Renderizamos la vista pasando el array 'compras'
         res.render('perfil', {
             pagina: 'Mi Perfil',
             msg,
-            compras // Esta es la variable que "nace" de la base de datos
+            compras
         });
 
     } catch (error) {
@@ -331,38 +348,32 @@ const mostrarPerfil = async (req, res) => {
         res.render('perfil', {
             pagina: 'Mi Perfil',
             msg,
-            compras: [] // Enviamos array vacío si algo falla para evitar errores en PUG
+            compras: []
         });
     }
 };
-// 2. Actualizar datos
 const actualizarPerfil = async (req, res) => {
     const { nombre, password } = req.body;
-    const { id } = req.session.usuario;//al obtener el id de la sesion no me tengo que preocupar de a que usuario estoy modificando
+    const { id } = req.session.usuario;
 
     try {
         const usuario = await Usuario.findByPk(id);//mediante sequelize buscamos en la basd de datos el usuario con este id
         usuario.nombre = nombre;
 
-        // Solo actualizamos el password si el usuario escribió algo
         if (password && password.trim() !== "") {
             const salt = await bcrypt.genSalt(10);
             usuario.password = await bcrypt.hash(password, salt);//encriptamos la contraseña para que a la hora de hacer login funcione correctamente
         }
 
         await usuario.save();//lo guardamos con los nuevos valores
+        req.session.usuario.nombre = nombre;
 
-        // IMPORTANTE: Actualizamos la sesión para que el Header cambie el nombre al instante
-        req.session.usuario.nombre = nombre;//una vez cambiado el nombre se actualiza el nombre de la sesion
-
-        res.redirect('/perfil?msg=actualizado');
+        res.redirect('/perfil?msg=actualizado');/* para mostrar el contenedor de actualizado*/
     } catch (error) {
         console.log(error);
         res.redirect('/perfil');
     }
 };
-
-// 3. Eliminar cuenta
 const eliminarCuenta = async (req, res) => {
     const { id } = req.session.usuario;
 
@@ -396,25 +407,21 @@ const resenias = async (req, res) => {
         console.error(error);
     }
 }
-// Crear un comentario
+/*uso el mismo que en el proyecto anterior pero con la diferencia de que el autor me lo coge el pug de la session y no del formulario*/
 const crearComentario = async (req, res) => {
     const { id_joya, autor, contenido } = req.body;
 
     try {
-        // Crear comentario
         await Comentario.create({
             id_joya,
             autor,
             contenido
         });
-
-        // Buscar el slug de la joya para redirigir
         const joya = await Joya.findByPk(id_joya);
         if (!joya) return res.status(404).send('Joya no encontrada')
         else {
             return res.status(404).send('Mensaje creado');
         }
-
         res.redirect(`resenias`);
     } catch (error) {
         console.error(error);
@@ -422,12 +429,12 @@ const crearComentario = async (req, res) => {
     }
 };
 
-// Página de prueba (si se necesita)
+/*pagina del anterior proyecto de node*/
 const paginaprueba = async (req, res) => {
     res.render('joyai', {
         pagina: 'Joyai Prueba',
-        resultado: {},       // evita undefined en la vista
-        comentarios: []      // array vacío para evitar errores
+        resultado: {},
+        comentarios: []
     });
 };
 
@@ -452,5 +459,7 @@ export {
     agregarAlCarrito,
     mostrarCarrito,
     eliminarDelCarrito,
-    finalizarCompra
+    finalizarCompra,
+    mostrarLogin,
+    mostrarRegistro
 };
